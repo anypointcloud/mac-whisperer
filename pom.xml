@@ -4,11 +4,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.mule.whisperer</groupId>
+    <groupId>cloud.anypoint</groupId>
     <artifactId>mac-whisperer</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
     <name>MAC Whisperer</name>
+    <description>Conversion between text and speech for MuleSoft</description>
+    <url>https://github.com/MuleSoft-AI-Chain-Project/mac-whisperer</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Amir Khan</name>
+            <email>amir.khan@mulesoft.com</email>
+            <organization>Salesforce</organization>
+            <organizationUrl>https://www.mulesoft.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Ryan Hoegg</name>
+            <email>ryan@hoegg.software</email>
+            <organization>Hoegg Software, Co.</organization>
+            <organizationUrl>https://hoegg.software</organizationUrl>
+        </developer>
+    </developers>
 
     <parent>
         <groupId>org.mule.extensions</groupId>
@@ -72,6 +94,21 @@
             <version>1.6.1</version>
         </dependency>
 
+        <!-- API, java.xml.bind module -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Runtime, com.sun.xml.bind module -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     
 	<repositories>
@@ -94,19 +131,79 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>exchange-repository</id>
-			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/49585042-c077-4af7-9761-8763a25ebc91/maven</url>
-			<layout>default</layout>
-		</snapshotRepository>
-		<repository>
-			<id>exchange-repository</id>
-			<name>Exchange Repository</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/49585042-c077-4af7-9761-8763a25ebc91/maven</url>
-			<layout>default</layout>
-		</repository>
-	</distributionManagement>
+    <scm>
+        <connection>scm:git:git@github.com:anypointcloud/mac-whisperer.git</connection>
+        <developerConnection>scm:git:git@github.com:anypointcloud/mac-whisperer.git</developerConnection>
+        <url>https://github.com/anypointcloud/mac-whisperer</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
