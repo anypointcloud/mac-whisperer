@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>cloud.anypoint</groupId>
     <artifactId>mac-whisperer</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <packaging>mule-extension</packaging>
     <name>MAC Whisperer</name>
     <description>Conversion between text and speech for MuleSoft</description>
@@ -170,7 +168,7 @@
         <connection>scm:git:git@github.com:anypointcloud/mac-whisperer.git</connection>
         <developerConnection>scm:git:git@github.com:anypointcloud/mac-whisperer.git</developerConnection>
         <url>https://github.com/anypointcloud/mac-whisperer</url>
-        <tag>HEAD</tag>
+        <tag>0.2.0</tag>
     </scm>
 
     <distributionManagement>
