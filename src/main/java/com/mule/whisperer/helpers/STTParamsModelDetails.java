@@ -34,18 +34,5 @@ public class STTParamsModelDetails {
 		return temperature;
 	}
 
-
-	@Parameter
-	@Expression(ExpressionSupport.SUPPORTED)
-	@OfValues(ResponseFormatTTS.class)
-	@Optional(defaultValue = "json")
-	private String responseFormat;
-
-	public String getResponseFormat() {
-		return responseFormat;
-	}
-
-
-
 	
 }

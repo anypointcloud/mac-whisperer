@@ -5,6 +5,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICAT
 
 import java.net.HttpURLConnection;
 
+import com.mule.whisperer.internal.connection.WhisperConnection;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -12,6 +13,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.*;
 
 import com.mule.whisperer.MuleChainVoiceConfiguration;
@@ -37,9 +39,8 @@ import org.slf4j.LoggerFactory;
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
 public class MuleChainVoiceOperations {
-  private static final String API_URL = "https://api.openai.com/v1/audio/";
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleChainVoiceOperations.class);
-
+    private static final String API_URL = "";
 
 /**
    * Converts speech to Text in local mode
@@ -148,12 +149,12 @@ public class MuleChainVoiceOperations {
 
 
 
-  /**
-   * Converts speech to Text
-   */
   @MediaType(value = APPLICATION_JSON, strict = false)
-  @Alias("Speech-to-text")
-  public InputStream speechToText(@Content TypedValue<InputStream> audioContent, @Optional String finetuningPrompt, @Config MuleChainVoiceConfiguration configuration, @ParameterGroup(name= "Additional properties") STTParamsModelDetails paramDetails) {
+  @Alias("speech-to-text")
+  public InputStream speechToText(@Content TypedValue<InputStream> audioContent,
+                                  @Optional String finetuningPrompt,
+                                  @Config MuleChainVoiceConfiguration configuration,
+                                  @ParameterGroup(name= "Additional properties") STTParamsModelDetails paramDetails) {
     JSONObject jsonResponse;
     
     try {
@@ -161,14 +162,14 @@ public class MuleChainVoiceOperations {
       URL url = new URL(API_URL + "transcriptions");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("POST");
-      connection.setRequestProperty("Authorization", "Bearer " + configuration.getApiKey());
+      connection.setRequestProperty("Authorization", "Bearer ");
       connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW");
 
       connection.setDoOutput(true);
 
       // Write the audio file and model parameter to the request
       try (OutputStream os = connection.getOutputStream()) {
-          writeMultipartData(os, audioContent, paramDetails.getModelName(), finetuningPrompt, paramDetails.getResponseFormat(), (Double) paramDetails.getTemperature(), paramDetails.getLanguage());
+          writeMultipartData(os, audioContent, paramDetails.getModelName(), finetuningPrompt, "text", (Double) paramDetails.getTemperature(), paramDetails.getLanguage());
       }
 
       // Get the response
@@ -214,11 +215,9 @@ public class MuleChainVoiceOperations {
 
   }
 
-  /**
-   * Text speech to Speech
-   */
   @MediaType(value = APPLICATION_JSON, strict = false)
-  @Alias("Text-to-speech")
+  @Alias("text-to-speech")
+  @Ignore
   public InputStream textToSpeech(String textToConvert, String pathToOutputFile, @Config MuleChainVoiceConfiguration configuration,  @ParameterGroup(name= "Additional properties") TTSParamsModelDetails paramDetails){
 
     try {
@@ -234,7 +233,7 @@ public class MuleChainVoiceOperations {
       URL url = new URL(API_URL + "speech");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("POST");
-      connection.setRequestProperty("Authorization", "Bearer " + configuration.getApiKey());
+      connection.setRequestProperty("Authorization", "Bearer ");
       connection.setRequestProperty("Content-Type", "application/json");
 
       connection.setDoOutput(true);
@@ -284,7 +283,6 @@ public class MuleChainVoiceOperations {
     responseJson.put("outputDirectory", pathToOutputFile);
 
     return toInputStream(responseJson.toString(), StandardCharsets.UTF_8);
-
   }
 
 
