@@ -1,15 +1,16 @@
 package com.mule.whisperer.internal.connection;
 
+import com.mule.whisperer.api.STTParamsModelDetails;
+import com.mule.whisperer.api.TTSParamsModelDetails;
+import org.json.JSONObject;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 import org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity;
-import org.mule.runtime.http.api.domain.entity.multipart.Part;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
@@ -19,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
@@ -31,12 +31,10 @@ public class OpenAiConnection implements WhisperConnection {
     private final String apiKey;
     private final HttpClient httpClient;
     private final URI apiUri;
-    private final String model;
-    public OpenAiConnection(String apiKey, HttpClient httpClient, URI apiUri, String model) {
+    public OpenAiConnection(String apiKey, HttpClient httpClient, URI apiUri) {
         this.apiKey = apiKey;
         this.httpClient = httpClient;
         this.apiUri = apiUri;
-        this.model = model;
     }
 
     public void validate() throws ConnectionException {
@@ -62,10 +60,10 @@ public class OpenAiConnection implements WhisperConnection {
     }
 
     @Override
-    public CompletableFuture<String> transcribe(TypedValue<InputStream> audioContent) {
+    public CompletableFuture<String> transcribe(TypedValue<InputStream> audioContent, STTParamsModelDetails params) {
         URI transcriptionEndpoint = apiUri.resolve("audio/transcriptions");
         byte[] audioBytes = IOUtils.toByteArray(audioContent.getValue());
-        HttpPart modelPart = new HttpPart("model", model.getBytes(), MediaType.TEXT_PLAIN, model.getBytes().length);
+        HttpPart modelPart = new HttpPart("model", params.getModelName().getBytes(), MediaType.TEXT_PLAIN, params.getModelName().getBytes().length);
         HttpPart formatPart = new HttpPart("response_format", "text".getBytes(), MediaType.TEXT_PLAIN, "text".getBytes().length);
         HttpPart audioPart = new HttpPart("file", "speech." + guessAudioFileExtension(audioContent.getDataType().getMediaType()), audioBytes, audioContent.getDataType().getMediaType().toString(), audioBytes.length);
 
@@ -85,8 +83,30 @@ public class OpenAiConnection implements WhisperConnection {
     }
 
     @Override
-    public CompletableFuture<String> transcribe(TypedValue<InputStream> audioContent, String fineTuningPrompt) {
-        return null;
+    public CompletableFuture<InputStream> generate(String text, TTSParamsModelDetails params) {
+        URI speechEndpoint = apiUri.resolve("audio/speech");
+
+        JSONObject requestObject = new JSONObject();
+        requestObject.put("model", params.getModelName());
+        requestObject.put("input", text);
+        requestObject.put("voice", params.getVoice());
+        requestObject.put("response_format", params.getResponseFormat());
+        requestObject.put("speed", params.getSpeed());
+
+        HttpRequest request = HttpRequest.builder()
+                .addHeader("Authorization", "Bearer " + apiKey)
+                .method(POST)
+                .uri(speechEndpoint)
+                .addHeader("Content-Type", "application/json")
+                .entity(new ByteArrayHttpEntity(requestObject.toString().getBytes()))
+                .build();
+
+        return httpClient.sendAsync(request).thenApply(response -> {
+            if (200 != response.getStatusCode()) {
+                throw new RuntimeException("Unexpected status code " + response.getStatusCode() + " from OpenAI API");
+            }
+            return response.getEntity().getContent();
+        });
     }
 
     private static String guessAudioFileExtension(org.mule.runtime.api.metadata.MediaType audioContentType) {
@@ -111,8 +131,11 @@ public class OpenAiConnection implements WhisperConnection {
             case "audio/ogg":
                 extension = "ogg";
                 break;
-            case "audio.webm":
+            case "audio/webm":
                 extension = "weba";
+                break;
+            case "audio/aac":
+                extension = "aac";
                 break;
         }
         return extension;

@@ -1,4 +1,5 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.api;
+import com.mule.whisperer.internal.helpers.ModelNameProvider;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;

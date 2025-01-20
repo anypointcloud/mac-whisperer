@@ -38,14 +38,10 @@ public class OpenAiConnectionProvider implements CachedConnectionProvider<OpenAi
     @Optional
     private TlsContextFactory tlsContext;
 
-    @Parameter
-    @Optional(defaultValue = "whisper-1")
-    private String model;
-
     @Override
     public OpenAiConnection connect() throws ConnectionException {
         try {
-            return new OpenAiConnection(apiKey, httpClient, new URI(API_URL), model);
+            return new OpenAiConnection(apiKey, httpClient, new URI(API_URL));
         } catch (URISyntaxException e) {
             throw new ConnectionException(e);
         }

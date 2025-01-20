@@ -1,4 +1,7 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.api;
+import com.mule.whisperer.internal.helpers.ModelNameProviderTTS;
+import com.mule.whisperer.internal.helpers.ResponseFormatTTS;
+import com.mule.whisperer.internal.helpers.VoicesProvider;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -38,7 +41,7 @@ public class TTSParamsModelDetails {
 
 	@Parameter
 	@Expression(ExpressionSupport.SUPPORTED)
-	@OfValues(ResponseFormatSTT.class)
+	@OfValues(ResponseFormatTTS.class)
 	@Optional(defaultValue = "mp3")
 	private String responseFormat;
 
@@ -46,7 +49,4 @@ public class TTSParamsModelDetails {
 		return responseFormat;
 	}
 
-
-
-	
 }

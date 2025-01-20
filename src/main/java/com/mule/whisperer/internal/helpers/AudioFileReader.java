@@ -1,10 +1,9 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.internal.helpers;
 
 import javazoom.jl.decoder.*;
 import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.*;
-import org.slf4j.*;
 
 public class AudioFileReader {
 

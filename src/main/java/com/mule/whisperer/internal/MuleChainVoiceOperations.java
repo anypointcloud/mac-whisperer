@@ -5,7 +5,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICAT
 
 import java.net.HttpURLConnection;
 
-import com.mule.whisperer.internal.connection.WhisperConnection;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -17,11 +16,11 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.*;
 
 import com.mule.whisperer.MuleChainVoiceConfiguration;
-import com.mule.whisperer.helpers.STTParamsModelDetails;
-import com.mule.whisperer.helpers.TTSParamsModelDetails;
-import com.mule.whisperer.helpers.LocalSTTParamsModelDetails;
-import com.mule.whisperer.helpers.AudioFileReader;
-import com.mule.whisperer.helpers.WhisperContextHelper;
+import com.mule.whisperer.api.STTParamsModelDetails;
+import com.mule.whisperer.api.TTSParamsModelDetails;
+import com.mule.whisperer.internal.helpers.LocalSTTParamsModelDetails;
+import com.mule.whisperer.internal.helpers.AudioFileReader;
+import com.mule.whisperer.internal.helpers.WhisperContextHelper;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 

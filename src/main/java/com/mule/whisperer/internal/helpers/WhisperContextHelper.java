@@ -1,4 +1,4 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.internal.helpers;
 
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperJNI;

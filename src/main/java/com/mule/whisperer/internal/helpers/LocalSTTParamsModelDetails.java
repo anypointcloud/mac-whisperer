@@ -1,4 +1,4 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.internal.helpers;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
