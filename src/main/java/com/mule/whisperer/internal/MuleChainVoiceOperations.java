@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.*;
 
-import com.mule.whisperer.MuleChainVoiceConfiguration;
+import com.mule.whisperer.WhisperConfiguration;
 import com.mule.whisperer.api.STTParamsModelDetails;
 import com.mule.whisperer.api.TTSParamsModelDetails;
 import com.mule.whisperer.internal.helpers.LocalSTTParamsModelDetails;
@@ -46,7 +46,7 @@ public class MuleChainVoiceOperations {
    */
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("Speech-to-text-local")
-  public InputStream speechToTextLocal(@Content InputStream audioFile, @Config MuleChainVoiceConfiguration configuration, @ParameterGroup(name = "Local properties") LocalSTTParamsModelDetails localParams) {
+  public InputStream speechToTextLocal(@Content InputStream audioFile, @Config WhisperConfiguration configuration, @ParameterGroup(name = "Local properties") LocalSTTParamsModelDetails localParams) {
       JSONObject jsonResponse = new JSONObject();
       File tempAudioFile = null; // Declare tempAudioFile here to access it in finally block
 
@@ -152,7 +152,7 @@ public class MuleChainVoiceOperations {
   @Alias("speech-to-text")
   public InputStream speechToText(@Content TypedValue<InputStream> audioContent,
                                   @Optional String finetuningPrompt,
-                                  @Config MuleChainVoiceConfiguration configuration,
+                                  @Config WhisperConfiguration configuration,
                                   @ParameterGroup(name= "Additional properties") STTParamsModelDetails paramDetails) {
     JSONObject jsonResponse;
     
@@ -217,7 +217,7 @@ public class MuleChainVoiceOperations {
   @MediaType(value = APPLICATION_JSON, strict = false)
   @Alias("text-to-speech")
   @Ignore
-  public InputStream textToSpeech(String textToConvert, String pathToOutputFile, @Config MuleChainVoiceConfiguration configuration,  @ParameterGroup(name= "Additional properties") TTSParamsModelDetails paramDetails){
+  public InputStream textToSpeech(String textToConvert, String pathToOutputFile, @Config WhisperConfiguration configuration, @ParameterGroup(name= "Additional properties") TTSParamsModelDetails paramDetails){
 
     try {
       // Create JSON payload

@@ -6,7 +6,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 
 @Operations(SpeechOperations.class)
-public class MuleChainVoiceConfiguration {
+public class WhisperConfiguration {
 
   @Parameter
    private boolean useLocalWhisper;
