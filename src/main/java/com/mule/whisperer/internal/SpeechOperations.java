@@ -3,15 +3,15 @@ package com.mule.whisperer.internal;
 import com.mule.whisperer.api.STTParamsModelDetails;
 import com.mule.whisperer.api.TTSParamsModelDetails;
 import com.mule.whisperer.internal.connection.WhisperConnection;
+import com.mule.whisperer.internal.metadata.TranscriptionOutputResolver;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -25,16 +25,17 @@ public class SpeechOperations {
 
     @DisplayName("Speech to Text")
     @Alias("speech-to-text")
-    @MediaType(MediaType.TEXT_PLAIN) // TODO: consider changing this for verbose-text
+    @OutputResolver(output = TranscriptionOutputResolver.class, attributes = TranscriptionOutputResolver.class)
+    @MediaType(value = MediaType.TEXT_PLAIN, strict = false)
     public void transcribe(@Connection WhisperConnection connection,
                            @Content TypedValue<InputStream> audioContent,
                            @Optional String finetuningPrompt,
-                           @ParameterDsl(allowReferences = false) @Expression(ExpressionSupport.NOT_SUPPORTED) STTParamsModelDetails transcriptionOptions,
-                           CompletionCallback<String, Void> callback) {
-        connection.transcribe(audioContent, transcriptionOptions).whenComplete((transcribedText, e) -> {
+                           @MetadataKeyId @ParameterGroup(name = "Transcription Options") STTParamsModelDetails transcriptionOptions,
+                           CompletionCallback<String, Object> callback) {
+        connection.transcribe(audioContent, finetuningPrompt, transcriptionOptions).whenComplete((result, e) -> {
             if (null == e) {
-                callback.success(Result.<String, Void>builder()
-                        .output(transcribedText)
+                callback.success(Result.<String, Object>builder()
+                        .output(result.getOutput())
                         .build());
             } else {
                 // error, TODO: implement as Mule error

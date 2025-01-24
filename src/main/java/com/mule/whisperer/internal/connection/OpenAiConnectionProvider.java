@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Alias("open-ai-connection")
+@Alias("open-ai")
 public class OpenAiConnectionProvider implements CachedConnectionProvider<OpenAiConnection>, Startable, Stoppable {
     private static final String API_URL = "https://api.openai.com/v1/";
 

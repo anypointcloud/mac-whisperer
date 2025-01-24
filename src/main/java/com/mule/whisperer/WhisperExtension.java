@@ -16,7 +16,6 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 @Xml(prefix = "whisperer")
 @Extension(name = "MAC Whisperer")
 @Configurations(WhisperConfiguration.class)
-@ConnectionProviders(OpenAiConnectionProvider.class)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 public class WhisperExtension {
 

@@ -1,5 +1,5 @@
 package com.mule.whisperer.api;
-import com.mule.whisperer.internal.helpers.ModelNameProvider;
+import com.mule.whisperer.internal.metadata.ModelNameProvider;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -35,5 +35,12 @@ public class STTParamsModelDetails {
 		return temperature;
 	}
 
-	
+	@Parameter
+	@Expression(ExpressionSupport.SUPPORTED)
+	@Optional(defaultValue = "false")
+	private boolean verbose;
+
+	public boolean isVerbose() {
+		return verbose;
+	}
 }

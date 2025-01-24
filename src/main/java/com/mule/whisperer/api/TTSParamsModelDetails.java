@@ -1,7 +1,7 @@
 package com.mule.whisperer.api;
-import com.mule.whisperer.internal.helpers.ModelNameProviderTTS;
-import com.mule.whisperer.internal.helpers.ResponseFormatTTS;
-import com.mule.whisperer.internal.helpers.VoicesProvider;
+import com.mule.whisperer.internal.metadata.ModelNameProviderTTS;
+import com.mule.whisperer.internal.metadata.ResponseFormatTTS;
+import com.mule.whisperer.internal.metadata.VoicesProvider;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;

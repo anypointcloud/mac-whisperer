@@ -1,5 +1,6 @@
 package com.mule.whisperer.internal.connection;
 
+import com.mule.whisperer.api.OpenAiTranscriptionAttributes;
 import com.mule.whisperer.api.STTParamsModelDetails;
 import com.mule.whisperer.api.TTSParamsModelDetails;
 import org.json.JSONObject;
@@ -7,6 +8,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
@@ -19,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
@@ -60,25 +62,55 @@ public class OpenAiConnection implements WhisperConnection {
     }
 
     @Override
-    public CompletableFuture<String> transcribe(TypedValue<InputStream> audioContent, STTParamsModelDetails params) {
+    public CompletableFuture<Result<String, Object>> transcribe(TypedValue<InputStream> audioContent, String fineTuningPrompt, STTParamsModelDetails params) {
         URI transcriptionEndpoint = apiUri.resolve("audio/transcriptions");
+
+        String responseFormat = "text";
+        if (params.isVerbose()) {
+            responseFormat = "verbose_json";
+        }
+
         byte[] audioBytes = IOUtils.toByteArray(audioContent.getValue());
         HttpPart modelPart = new HttpPart("model", params.getModelName().getBytes(), MediaType.TEXT_PLAIN, params.getModelName().getBytes().length);
-        HttpPart formatPart = new HttpPart("response_format", "text".getBytes(), MediaType.TEXT_PLAIN, "text".getBytes().length);
+        HttpPart formatPart = new HttpPart("response_format", responseFormat.getBytes(), MediaType.TEXT_PLAIN, responseFormat.getBytes().length);
         HttpPart audioPart = new HttpPart("file", "speech." + guessAudioFileExtension(audioContent.getDataType().getMediaType()), audioBytes, audioContent.getDataType().getMediaType().toString(), audioBytes.length);
 
+        List<HttpPart> parts = Arrays.asList(audioPart, modelPart, formatPart);
+        if (null != fineTuningPrompt && !fineTuningPrompt.isEmpty()) {
+            parts.add(new HttpPart("prompt", fineTuningPrompt.getBytes(), MediaType.TEXT_PLAIN, fineTuningPrompt.getBytes().length));
+        }
+        if (params.getTemperature().floatValue() > 0) {
+            parts.add(new HttpPart("temperature", params.getTemperature().toString().getBytes(), MediaType.TEXT_PLAIN, params.getTemperature().toString().getBytes().length));
+        }
+        if (null != params.getLanguage() && !params.getLanguage().isEmpty()) {
+            parts.add(new HttpPart("language", params.getLanguage().getBytes(), MediaType.TEXT_PLAIN, params.getLanguage().getBytes().length));
+        }
         HttpRequest request = HttpRequest.builder()
                 .addHeader("Authorization", "Bearer " + apiKey)
                 .method(POST)
                 .uri(transcriptionEndpoint)
-                .entity(new MultipartHttpEntity(Arrays.asList(audioPart, modelPart, formatPart)))
+                .entity(new MultipartHttpEntity(parts))
                 .build();
         return httpClient.sendAsync(request)
                 .thenApply(response -> {
                     if (200 != response.getStatusCode()) {
                         throw new RuntimeException("Unexpected status code " + response.getStatusCode() + " from OpenAI API");
                     }
-                    return IOUtils.toString(response.getEntity().getContent());
+                    if (params.isVerbose()) {
+                        JSONObject responseObject = new JSONObject(IOUtils.toString(response.getEntity().getContent()));
+                        OpenAiTranscriptionAttributes attributes = new OpenAiTranscriptionAttributes();
+                        attributes.setLanguage(responseObject.optString("language"));
+                        attributes.setDuration(responseObject.optDouble("duration"));
+                        // not yet supporting words and segments arrays
+                        return Result.<String, Object>builder()
+                                .output(responseObject.getString("text"))
+                                .attributes(attributes)
+                                .build();
+                    } else {
+                        return Result.<String, Object>builder()
+                                .output(IOUtils.toString(response.getEntity().getContent()))
+                                .build();
+                    }
                 });
     }
 
