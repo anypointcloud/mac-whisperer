@@ -3,6 +3,9 @@ package com.mule.whisperer.internal.connection;
 import com.mule.whisperer.api.OpenAiTranscriptionAttributes;
 import com.mule.whisperer.api.STTParamsModelDetails;
 import com.mule.whisperer.api.TTSParamsModelDetails;
+import com.mule.whisperer.internal.error.GenerationException;
+import com.mule.whisperer.internal.error.TranscriptionException;
+import com.mule.whisperer.internal.helpers.AudioUtils;
 import org.json.JSONObject;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -71,11 +74,12 @@ public class OpenAiConnection implements WhisperConnection {
         }
 
         byte[] audioBytes = IOUtils.toByteArray(audioContent.getValue());
-        HttpPart modelPart = new HttpPart("model", params.getModelName().getBytes(), MediaType.TEXT_PLAIN, params.getModelName().getBytes().length);
-        HttpPart formatPart = new HttpPart("response_format", responseFormat.getBytes(), MediaType.TEXT_PLAIN, responseFormat.getBytes().length);
-        HttpPart audioPart = new HttpPart("file", "speech." + guessAudioFileExtension(audioContent.getDataType().getMediaType()), audioBytes, audioContent.getDataType().getMediaType().toString(), audioBytes.length);
+        ArrayList<HttpPart> parts = new ArrayList<>();
 
-        List<HttpPart> parts = Arrays.asList(audioPart, modelPart, formatPart);
+        parts.add(new HttpPart("model", params.getModelName().getBytes(), MediaType.TEXT_PLAIN, params.getModelName().getBytes().length));
+        parts.add(new HttpPart("response_format", responseFormat.getBytes(), MediaType.TEXT_PLAIN, responseFormat.getBytes().length));
+        parts.add(new HttpPart("file", "speech." + AudioUtils.guessAudioFileExtension(audioContent.getDataType().getMediaType()), audioBytes, audioContent.getDataType().getMediaType().toString(), audioBytes.length));
+
         if (null != fineTuningPrompt && !fineTuningPrompt.isEmpty()) {
             parts.add(new HttpPart("prompt", fineTuningPrompt.getBytes(), MediaType.TEXT_PLAIN, fineTuningPrompt.getBytes().length));
         }
@@ -94,7 +98,8 @@ public class OpenAiConnection implements WhisperConnection {
         return httpClient.sendAsync(request)
                 .thenApply(response -> {
                     if (200 != response.getStatusCode()) {
-                        throw new RuntimeException("Unexpected status code " + response.getStatusCode() + " from OpenAI API");
+                        LOGGER.error(IOUtils.toString(response.getEntity().getContent()));
+                        throw new TranscriptionException("Unexpected status code " + response.getStatusCode() + " from OpenAI API");
                     }
                     if (params.isVerbose()) {
                         JSONObject responseObject = new JSONObject(IOUtils.toString(response.getEntity().getContent()));
@@ -135,41 +140,11 @@ public class OpenAiConnection implements WhisperConnection {
 
         return httpClient.sendAsync(request).thenApply(response -> {
             if (200 != response.getStatusCode()) {
-                throw new RuntimeException("Unexpected status code " + response.getStatusCode() + " from OpenAI API");
+                LOGGER.error(IOUtils.toString(response.getEntity().getContent()));
+                throw new GenerationException("Unexpected status code " + response.getStatusCode() + " from OpenAI API");
             }
             return response.getEntity().getContent();
         });
     }
 
-    private static String guessAudioFileExtension(org.mule.runtime.api.metadata.MediaType audioContentType) {
-        String extension = "mp3";
-        switch (audioContentType.withoutParameters().toString()) {
-            case "audio/m4a":
-            case "audio/mp4":
-                extension = "m4a";
-                break;
-            case "audio/flac":
-            case "audio/x-flac":
-                extension = "flac";
-                break;
-            case "audio/wav":
-            case "audio/vnd.wav":
-            case "audio/vnd.wave":
-            case "audio/wave":
-            case "audio/x-wav":
-            case "audio/x-pn-wav":
-                extension = "wav";
-                break;
-            case "audio/ogg":
-                extension = "ogg";
-                break;
-            case "audio/webm":
-                extension = "weba";
-                break;
-            case "audio/aac":
-                extension = "aac";
-                break;
-        }
-        return extension;
-    }
 }

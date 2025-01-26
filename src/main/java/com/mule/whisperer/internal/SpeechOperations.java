@@ -3,12 +3,15 @@ package com.mule.whisperer.internal;
 import com.mule.whisperer.api.STTParamsModelDetails;
 import com.mule.whisperer.api.TTSParamsModelDetails;
 import com.mule.whisperer.internal.connection.WhisperConnection;
+import com.mule.whisperer.internal.error.GenerationErrorTypeProvider;
+import com.mule.whisperer.internal.error.TranscriptionErrorTypeProvider;
 import com.mule.whisperer.internal.metadata.TranscriptionOutputResolver;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.*;
@@ -27,6 +30,7 @@ public class SpeechOperations {
     @Alias("speech-to-text")
     @OutputResolver(output = TranscriptionOutputResolver.class, attributes = TranscriptionOutputResolver.class)
     @MediaType(value = MediaType.TEXT_PLAIN, strict = false)
+    @Throws(TranscriptionErrorTypeProvider.class)
     public void transcribe(@Connection WhisperConnection connection,
                            @Content TypedValue<InputStream> audioContent,
                            @Optional String finetuningPrompt,
@@ -38,8 +42,7 @@ public class SpeechOperations {
                         .output(result.getOutput())
                         .build());
             } else {
-                // error, TODO: implement as Mule error
-                callback.error(e);
+                callback.error(e.getCause());
             }
         });
     }
@@ -47,6 +50,7 @@ public class SpeechOperations {
     @DisplayName("Text to Speech")
     @Alias("text-to-speech")
     @MediaType(value = "audio/mp3", strict = false)
+    @Throws(GenerationErrorTypeProvider.class)
     public void generateSpeech(@Connection WhisperConnection connection,
                                @Content String text,
                                @ParameterDsl(allowReferences = false) @Expression(ExpressionSupport.NOT_SUPPORTED) TTSParamsModelDetails generationOptions,
@@ -60,8 +64,7 @@ public class SpeechOperations {
                         .mediaType(inferMediaType(generationOptions))
                         .build());
             } else {
-                // error, TODO: implement as Mule error
-                callback.error(e);
+                callback.error(e.getCause());
             }
         });
     }

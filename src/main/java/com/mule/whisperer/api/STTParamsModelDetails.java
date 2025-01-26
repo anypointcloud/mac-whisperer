@@ -19,7 +19,7 @@ public class STTParamsModelDetails {
 
 	@Parameter
 	@Expression(ExpressionSupport.SUPPORTED)
-	@Optional(defaultValue = "auto")
+	@Optional(defaultValue = "en")
 	private String language;
 
 	public String getLanguage() {	
