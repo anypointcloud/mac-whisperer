@@ -1,0 +1,48 @@
+#%RAML 1.0
+
+title: MuleSoft Whisperer API
+description: API for audio transcription and text generation
+version: 1.0.0
+
+baseUri: http://localhost:{port}
+baseUriParameters:
+  port:
+    default: "8081"
+
+/transcribe:
+  post:
+    description: Transcribes audio content into text
+    body:
+      multipart/form-data:
+        properties:
+          audio:
+            type: file
+            required: true
+    responses:
+      200:
+        description: Transcription completed successfully
+        body:
+          application/json:
+            example:
+              {
+                "transcription": "This is the transcribed text."
+              }
+
+/generate:
+  post:
+    description: Generates text based on input prompts
+    body:
+      application/json:
+        properties:
+          text:
+            type: string
+            required: true
+    responses:
+      200:
+        description: Text generated successfully
+        body:
+          application/json:
+            example:
+              {
+                "generatedText": "This is the generated response."
+              }

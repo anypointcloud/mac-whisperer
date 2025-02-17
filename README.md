@@ -32,8 +32,8 @@ Then add the following dependency to your application's `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>cloud.anypoint</groupId>
-    <artifactId>mule-whisperer-connector</artifactId>
+    <groupId>com.mulesoft.connectors</groupId>
+    <artifactId>mule4-whisperer-connector</artifactId>
     <version>{version}</version>
     <classifier>mule-plugin</classifier>
 </dependency>
