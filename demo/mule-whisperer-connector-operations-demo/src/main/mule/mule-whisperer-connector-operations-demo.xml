@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/m
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<whisperer:config name="Local_Config" doc:name="MAC Whisperer Config" doc:id="cb1790cd-3500-4b11-b9cb-889ef0857fde" >
-		<whisperer:local-whisper-connection language="auto" modelPath='/Users/tbolis/IdeaProjects/mule-whisperer-connector/demo/mule-whisperer-connector-operations-demo/src/main/resources/model.bin'/>
+		<whisperer:local-whisper-connection modelPath='/Users/tbolis/IdeaProjects/mule-whisperer-connector/demo/mule-whisperer-connector-operations-demo/src/main/resources/model.bin' printProgress="true"/>
 	</whisperer:config>
 	<whisperer:config name="OpenAI_Config" doc:name="MAC Whisperer Config" doc:id="c8522973-353d-4eff-aa3e-21be4b1cfc8e" >
 		<whisperer:open-ai-connection apiKey="demo" />
@@ -25,7 +25,7 @@ http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/m
 		<apikit:console doc:name="APIkit Console" doc:id="b5f5e58d-e57a-44b0-840b-aec95d0da05d" config-ref="Router"/>
 	</flow>
 	<flow doc:id="fa9be2cd-68f1-4537-a842-ea8fd7eedd09" name="post:\transcribe">
-		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="Local_Config" modelName="ggml-large-v3-turbo-q8_0">
+		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="Local_Config">
 			<whisperer:audio-content ><![CDATA[#[(((payload as Object).parts as Object).audio as Object).content]]]></whisperer:audio-content>
 		</whisperer:speech-to-text>
 	</flow>
