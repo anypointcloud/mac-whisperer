@@ -1,4 +1,4 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.internal.metadata;
 import java.util.Set;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;

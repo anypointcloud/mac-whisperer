@@ -1,15 +1,16 @@
-package com.mule.whisperer.helpers;
+package com.mule.whisperer.api;
+import com.mule.whisperer.internal.metadata.ModelNameProvider;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 
-public class TTSParamsModelDetails {
+public class STTParamsModelDetails {
 	@Parameter
 	@Expression(ExpressionSupport.SUPPORTED)
-	@OfValues(ModelNameProviderTTS.class)
-	@Optional(defaultValue = "tts-1")
+	@OfValues(ModelNameProvider.class)
+	@Optional(defaultValue = "whisper-1")
 	private String modelName;
 
 	public String getModelName() {
@@ -18,35 +19,28 @@ public class TTSParamsModelDetails {
 
 	@Parameter
 	@Expression(ExpressionSupport.SUPPORTED)
-	@OfValues(VoicesProvider.class)
-	@Optional(defaultValue = "alloy")
-	private String voice;
+	@Optional(defaultValue = "en")
+	private String language;
 
-	public String getVoice() {	
-		return voice;
+	public String getLanguage() {	
+		return language;
 	}
 
 	@Parameter
 	@Expression(ExpressionSupport.SUPPORTED)
-	@Optional(defaultValue = "1.0")
-	private Number speed;
+	@Optional(defaultValue = "0.9")
+	private Number temperature;
 
-	public Number getSpeed() {
-		return speed;
+	public Number getTemperature() {
+		return temperature;
 	}
-
 
 	@Parameter
 	@Expression(ExpressionSupport.SUPPORTED)
-	@OfValues(ResponseFormatSTT.class)
-	@Optional(defaultValue = "mp3")
-	private String responseFormat;
+	@Optional(defaultValue = "false")
+	private boolean verbose;
 
-	public String getResponseFormat() {
-		return responseFormat;
+	public boolean isVerbose() {
+		return verbose;
 	}
-
-
-
-	
 }
