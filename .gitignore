@@ -13,6 +13,7 @@
 .sfdx/
 .tooling*/
 /demo/*/src/test/
+/demo/**/*.bin
 
 # Maven
 target/

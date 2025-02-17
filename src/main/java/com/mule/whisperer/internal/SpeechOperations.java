@@ -53,7 +53,7 @@ public class SpeechOperations {
     @Throws(GenerationErrorTypeProvider.class)
     public void generateSpeech(@Connection WhisperConnection connection,
                                @Content String text,
-                               @ParameterDsl(allowReferences = false) @Expression(ExpressionSupport.NOT_SUPPORTED) TTSParamsModelDetails generationOptions,
+                               @ParameterGroup(name="Generation Options") TTSParamsModelDetails generationOptions,
                                CompletionCallback<InputStream, Void> callback) {
 
         connection.generate(text, generationOptions).whenComplete((audioData, e) -> {
