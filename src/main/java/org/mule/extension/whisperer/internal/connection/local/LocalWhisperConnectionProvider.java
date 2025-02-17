@@ -1,4 +1,4 @@
-package org.mule.extension.whisperer.internal.connection;
+package org.mule.extension.whisperer.internal.connection.local;
 
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperJNI;
@@ -28,13 +28,13 @@ public class LocalWhisperConnectionProvider implements CachedConnectionProvider<
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
-    @Optional(defaultValue = "en")
-    private String language;
+    @Optional(defaultValue = "false")
+    private boolean translate;
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
     @Optional(defaultValue = "false")
-    private boolean translate;
+    private boolean printProgress;
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
@@ -44,7 +44,7 @@ public class LocalWhisperConnectionProvider implements CachedConnectionProvider<
     private WhisperContext whisperContext;
     @Override
     public LocalWhisperConnection connect() throws ConnectionException {
-        return new LocalWhisperConnection(whisper, whisperContext, threads, language);
+        return new LocalWhisperConnection(whisper, whisperContext, threads, translate, printProgress);
     }
 
     @Override
@@ -62,6 +62,7 @@ public class LocalWhisperConnectionProvider implements CachedConnectionProvider<
             WhisperJNI.loadLibrary();
             whisper = new WhisperJNI();
             whisperContext = whisper.init(Paths.get(modelPath));
+
         } catch (IOException e) {
             throw new StartException(e, this);
         }

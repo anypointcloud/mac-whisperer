@@ -1,8 +1,9 @@
-package org.mule.extension.whisperer.internal.connection;
+package org.mule.extension.whisperer.internal.connection.openai;
 
 import org.mule.extension.whisperer.api.OpenAiTranscriptionAttributes;
 import org.mule.extension.whisperer.api.STTParamsModelDetails;
 import org.mule.extension.whisperer.api.TTSParamsModelDetails;
+import org.mule.extension.whisperer.internal.connection.WhisperConnection;
 import org.mule.extension.whisperer.internal.error.GenerationException;
 import org.mule.extension.whisperer.internal.error.TranscriptionException;
 import org.mule.extension.whisperer.internal.helpers.AudioUtils;

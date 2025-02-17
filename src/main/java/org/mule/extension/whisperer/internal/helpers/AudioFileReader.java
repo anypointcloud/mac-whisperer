@@ -16,13 +16,22 @@ public class AudioFileReader {
      * @throws IOException                   if an I/O error occurs during file reading.
      */
     public static float[] readFile(File audioFile) throws UnsupportedAudioFileException, IOException {
+
         // Open the audio file and create an AudioInputStream
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
-        
+
+        // Check if the audio is in the correct format (Mono and 16kHz)
+        AudioFormat format = audioInputStream.getFormat();
+        if (format.getChannels() != 1 || format.getSampleRate() != 16000) {
+            // If not Mono or 16kHz, convert it using FFmpeg
+            File convertedFile = convertToMono16kHz(audioFile);
+            return readFile(convertedFile); // Recursively read the converted file
+        }
+
         // Create a ByteBuffer to read the audio data into
         ByteBuffer captureBuffer = ByteBuffer.allocate(audioInputStream.available());
         captureBuffer.order(ByteOrder.LITTLE_ENDIAN); // Ensure the buffer uses little-endian byte order
-        
+
         // Read the audio data into the buffer
         int bytesRead = audioInputStream.read(captureBuffer.array());
         if (bytesRead == -1) {
@@ -31,20 +40,46 @@ public class AudioFileReader {
 
         // Convert the ByteBuffer to a ShortBuffer for easier processing
         ShortBuffer shortBuffer = captureBuffer.asShortBuffer();
-        
+
         // Create a float array to store the converted audio samples
         float[] samples = new float[shortBuffer.capacity()];
         int i = 0;
-        
+
         // Convert each short sample to a float value between -1.0f and 1.0f
         while (shortBuffer.hasRemaining()) {
             samples[i++] = Math.max(-1f, Math.min(((float) shortBuffer.get()) / (float) Short.MAX_VALUE, 1f));
         }
-        
+
         return samples; // Return the array of audio samples
     }
 
-    
+    public static File convertToMono16kHz(File inputFile) throws UnsupportedAudioFileException, IOException {
+        File outputFile = new File(inputFile.getParent(), "converted_16kHz_mono.wav");
+
+        // Load the audio file
+        AudioInputStream inputStream = AudioSystem.getAudioInputStream(inputFile);
+
+        // Create a new audio format with 16kHz sample rate and Mono
+        AudioFormat originalFormat = inputStream.getFormat();
+        AudioFormat targetFormat = new AudioFormat(
+            AudioFormat.Encoding.PCM_SIGNED,
+            16000, // Sample rate set to 16kHz
+            16,    // 16-bit
+            1,     // Mono
+            2,     // 2 bytes per frame (16-bit)
+            16000, // Frame rate matching the sample rate
+            false  // Little Endian
+        );
+
+        // Convert the stream to the new audio format
+        AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, inputStream);
+
+        // Write the converted file
+        AudioSystem.write(convertedStream, AudioFileFormat.Type.WAVE, outputFile);
+
+        return outputFile;
+    }
+
     /**
      * Converts an MP3 file to WAV format.
      *
@@ -62,7 +97,7 @@ class Mp3ToWavConverter {
 
     public static void convertMp3ToWav(String mp3FilePath, String wavFilePath) throws IOException, UnsupportedAudioFileException {
         try (FileInputStream mp3Stream = new FileInputStream(mp3FilePath);
-             FileOutputStream wavStream = new FileOutputStream(wavFilePath)) {
+            FileOutputStream wavStream = new FileOutputStream(wavFilePath)) {
 
             Bitstream bitstream = new Bitstream(mp3Stream);
             Decoder decoder = new Decoder();
@@ -72,7 +107,7 @@ class Mp3ToWavConverter {
             ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
             long totalFrames = 0;
             Header header;
-            
+
             while ((header = bitstream.readFrame()) != null) {
                 SampleBuffer output = (SampleBuffer) decoder.decodeFrame(header, bitstream);
 

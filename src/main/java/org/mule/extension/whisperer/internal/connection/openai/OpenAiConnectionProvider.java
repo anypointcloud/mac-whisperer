@@ -1,4 +1,4 @@
-package org.mule.extension.whisperer.internal.connection;
+package org.mule.extension.whisperer.internal.connection.openai;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
