@@ -1,4 +1,4 @@
-package org.mule.extension.whisperer.internal.connection.local;
+package org.mule.extension.whisperer.internal.connection.whisperjni;
 
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperJNI;
@@ -14,12 +14,14 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@Alias("local-whisper")
-public class LocalWhisperConnectionProvider implements CachedConnectionProvider<LocalWhisperConnection>, Startable, Stoppable {
+@Alias("whisperjni")
+@DisplayName("Whisper JNI")
+public class WhisperJNIConnectionProvider implements CachedConnectionProvider<WhisperJNIConnection>, Startable, Stoppable {
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
@@ -43,16 +45,16 @@ public class LocalWhisperConnectionProvider implements CachedConnectionProvider<
     private WhisperJNI whisper;
     private WhisperContext whisperContext;
     @Override
-    public LocalWhisperConnection connect() throws ConnectionException {
-        return new LocalWhisperConnection(whisper, whisperContext, threads, translate, printProgress);
+    public WhisperJNIConnection connect() throws ConnectionException {
+        return new WhisperJNIConnection(whisper, whisperContext, threads, translate, printProgress);
     }
 
     @Override
-    public void disconnect(LocalWhisperConnection localWhisperConnection) {
+    public void disconnect(WhisperJNIConnection whisperJNIConnection) {
     }
 
     @Override
-    public ConnectionValidationResult validate(LocalWhisperConnection localWhisperConnection) {
+    public ConnectionValidationResult validate(WhisperJNIConnection whisperJNIConnection) {
         return ConnectionValidationResult.success();
     }
 

@@ -1,4 +1,4 @@
-package org.mule.extension.whisperer.internal.connection.local;
+package org.mule.extension.whisperer.internal.connection.whisperjni;
 
 import org.mule.extension.whisperer.api.STTParamsModelDetails;
 import org.mule.extension.whisperer.api.TTSParamsModelDetails;
@@ -19,8 +19,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import java.util.concurrent.CompletableFuture;
 
-public class LocalWhisperConnection implements WhisperConnection {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalWhisperConnection.class);
+public class WhisperJNIConnection implements WhisperConnection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WhisperJNIConnection.class);
 
     private final WhisperJNI whisper;
     private final WhisperContext whisperContext;
@@ -28,7 +28,7 @@ public class LocalWhisperConnection implements WhisperConnection {
     private final boolean translate;
     private final boolean printProgress;
 
-    public LocalWhisperConnection(WhisperJNI whisper, WhisperContext whisperContext, int threads, boolean translate, boolean printProgress) {
+    public WhisperJNIConnection(WhisperJNI whisper, WhisperContext whisperContext, int threads, boolean translate, boolean printProgress) {
         this.whisper = whisper;
         this.whisperContext = whisperContext;
         this.threads = threads;

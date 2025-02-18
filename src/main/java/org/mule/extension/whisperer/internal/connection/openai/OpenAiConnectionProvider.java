@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
@@ -19,7 +20,8 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Alias("open-ai")
+@Alias("openai")
+@DisplayName("OpenAI")
 public class OpenAiConnectionProvider implements CachedConnectionProvider<OpenAiConnection>, Startable, Stoppable {
     private static final String API_URL = "https://api.openai.com/v1/";
 
