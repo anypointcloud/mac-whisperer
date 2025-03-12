@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:whisperer="http://www.mulesoft.org/schema/mule/whisperer"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/whisperer http://www.mulesoft.org/schema/mule/whisperer/current/mule-whisperer.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
@@ -14,23 +16,133 @@ http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/m
 	</whisperer:config>
 	<whisperer:config name="OpenAI_Config" doc:name="MAC Whisperer Config" doc:id="c8522973-353d-4eff-aa3e-21be4b1cfc8e" >
 		<whisperer:openai-connection apiKey="demo" />
-		<whisperer:opeai-connection apiKey="demo" />
 	</whisperer:config>
-	<apikit:config outboundHeadersMapName="outboundHeadersMapName" httpStatusVarName="httpStatus" doc:name="Router" doc:id="592b3ef8-e02c-452b-839f-ef324b173e5c" name="Router" api="api/whisperer-connector-operations-api.RAML" />
+	<apikit:config outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" doc:name="Router" doc:id="592b3ef8-e02c-452b-839f-ef324b173e5c" name="whisperer-connector-operations-api-config" api="api/whisperer-connector-operations-api.raml" />
 	<flow name="mule-whisperer-connector-operations-demoFlow" doc:id="91f82dca-5a27-469d-8cab-fd991ff5d0ba" >
-		<http:listener doc:name="Listener" doc:id="624573dc-b645-4e0b-b3fb-410ea6335504" config-ref="HTTP_Listener_config" path="/api/*"/>
-		<apikit:router doc:name="APIkit Router" doc:id="a51bf3ea-924f-4757-b7a0-c1bdd72a158b" config-ref="Router"/>
+		<http:listener doc:name="Listener" doc:id="624573dc-b645-4e0b-b3fb-410ea6335504" config-ref="HTTP_Listener_config" path="/api/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+		</http:listener>
+		<apikit:router doc:name="APIkit Router" doc:id="a51bf3ea-924f-4757-b7a0-c1bdd72a158b" config-ref="whisperer-connector-operations-api-config"/>
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
 	</flow>
 	<flow name="mule-whisperer-connector-operations-demoFlow1" doc:id="11b08d48-76c1-447d-ad36-a9c0f434c381" >
-		<http:listener doc:name="Listener" doc:id="c91e7456-ff1b-4e5a-9b40-c8a1582b9a21" config-ref="HTTP_Listener_config" path="/console/*"/>
-		<apikit:console doc:name="APIkit Console" doc:id="b5f5e58d-e57a-44b0-840b-aec95d0da05d" config-ref="Router"/>
+		<http:listener doc:name="Listener" doc:id="c91e7456-ff1b-4e5a-9b40-c8a1582b9a21" config-ref="HTTP_Listener_config" path="/console/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+		</http:listener>
+		<apikit:console doc:name="APIkit Console" doc:id="b5f5e58d-e57a-44b0-840b-aec95d0da05d" config-ref="whisperer-connector-operations-api-config"/>
+		<error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
 	</flow>
-	<flow doc:id="fa9be2cd-68f1-4537-a842-ea8fd7eedd09" name="post:\transcribe">
-		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Config">
+	<flow doc:id="fa9be2cd-68f1-4537-a842-ea8fd7eedd09" name="post:\transcribe:multipart\form-data:whisperer-connector-operations-api-config">
+		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Config" language="it">
 			<whisperer:audio-content ><![CDATA[#[(((payload as Object).parts as Object).audio as Object).content]]]></whisperer:audio-content>
 		</whisperer:speech-to-text>
 	</flow>
-	<flow name="post:\generate" doc:id="2e139863-a95c-4eaf-bae8-f4df68f18a05" >
+	<flow name="post:\generate:application\json:whisperer-connector-operations-api-config" doc:id="2e139863-a95c-4eaf-bae8-f4df68f18a05" >
 		<whisperer:text-to-speech doc:name="[OpenAI] Text to Speech" doc:id="5833960e-8239-407f-b8b7-8c883c68af5e" config-ref="OpenAI_Config">
 			<whisperer:text ><![CDATA[#[payload.text]]]></whisperer:text>
 		</whisperer:text-to-speech>
