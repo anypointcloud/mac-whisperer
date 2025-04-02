@@ -10,4 +10,5 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 @Operations(WhispererOperations.class)
 @ConnectionProviders({OpenAiConnectionProvider.class, WhisperJNIConnectionProvider.class})
 public class WhispererConfiguration {
+
 }

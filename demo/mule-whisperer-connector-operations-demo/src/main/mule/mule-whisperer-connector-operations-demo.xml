@@ -138,7 +138,7 @@ output application/json
         </error-handler>
 	</flow>
 	<flow doc:id="fa9be2cd-68f1-4537-a842-ea8fd7eedd09" name="post:\transcribe:multipart\form-data:whisperer-connector-operations-api-config">
-		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Config" language="it">
+		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Config" language="it" temperature="#[attributes.queryParams.temperature default 0.5]">
 			<whisperer:audio-content ><![CDATA[#[(((payload as Object).parts as Object).audio as Object).content]]]></whisperer:audio-content>
 		</whisperer:speech-to-text>
 	</flow>

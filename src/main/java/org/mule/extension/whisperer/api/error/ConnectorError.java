@@ -6,5 +6,6 @@ public enum ConnectorError implements ErrorTypeDefinition<ConnectorError> {
     CONNECTION_INCOMPATIBLE,
     TRANSCRIPTION,
     GENERATION,
+    AUDIO_FORMAT_NOT_SUPPORTED,
     TIMEOUT
 }

@@ -5,6 +5,14 @@ import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.*;
 
+import com.github.kokorin.jaffree.ffmpeg.FFmpeg;
+import com.github.kokorin.jaffree.ffmpeg.UrlInput;
+import com.github.kokorin.jaffree.ffmpeg.UrlOutput;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+
 public class AudioFileReader {
 
     /**
@@ -90,6 +98,30 @@ public class AudioFileReader {
      */
     public static void convertMp3ToWav(String mp3FilePath, String wavFilePath) throws IOException, UnsupportedAudioFileException {
         Mp3ToWavConverter.convertMp3ToWav(mp3FilePath, wavFilePath);
+    }
+
+    public static void convertM4AToWavWithFFmpeg(String m4aFilePath, String wavFilePath) throws IOException {
+
+        try {
+            // Create FFmpeg instance.
+            // If ffmpegExecutablePath is defined, use FFmpeg.atPath(ffmpegExecutablePath)
+            FFmpeg ffmpeg = FFmpeg.atPath(Paths.get("/opt/homebrew/Cellar/ffmpeg/7.1_4/bin")) // Assumes ffmpeg is in PATH
+                .addInput(UrlInput.fromPath(Paths.get(m4aFilePath)))
+                .addOutput(UrlOutput.toPath(Paths.get(wavFilePath))
+                .addArguments("-acodec", "pcm_s16le")
+            )
+            // Override existing output file if it exists
+            .setOverwriteOutput(true);
+
+            // Execute the FFmpeg command
+            ffmpeg.execute();
+
+            System.out.println("\nConversion finished successfully!");
+
+        } catch (Exception e) {
+            System.err.println("\nError during conversion: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
 

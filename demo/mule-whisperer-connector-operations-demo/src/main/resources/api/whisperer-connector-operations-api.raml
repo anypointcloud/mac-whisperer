@@ -12,6 +12,11 @@ baseUriParameters:
 /transcribe:
   post:
     description: Transcribes audio content into text
+    queryParameters:
+      temperature:
+        type: number
+        default: 0.5
+        required: false
     body:
       multipart/form-data:
         properties:
