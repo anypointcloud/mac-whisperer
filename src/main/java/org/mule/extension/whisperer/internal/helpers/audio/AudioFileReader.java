@@ -1,4 +1,4 @@
-package org.mule.extension.whisperer.internal.helpers;
+package org.mule.extension.whisperer.internal.helpers.audio;
 
 import javazoom.jl.decoder.*;
 import javax.sound.sampled.*;
@@ -9,9 +9,7 @@ import com.github.kokorin.jaffree.ffmpeg.FFmpeg;
 import com.github.kokorin.jaffree.ffmpeg.UrlInput;
 import com.github.kokorin.jaffree.ffmpeg.UrlOutput;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 
 public class AudioFileReader {
 

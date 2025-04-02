@@ -1,4 +1,4 @@
-package org.mule.extension.whisperer.internal.helpers;
+package org.mule.extension.whisperer.internal.helpers.audio;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.slf4j.Logger;
