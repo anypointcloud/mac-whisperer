@@ -23,10 +23,10 @@ Mulesoft Runtime >= 4.9.0
 
 ```xml
 <dependency>
-   <groupId>io.github.mulesoft-ai-chain-project</groupId>
-   <artifactId>mule4-whisperer-connector</artifactId>
-   <version>{version}</version>
-   <classifier>mule-plugin</classifier>
+    <groupId>cloud.anypoint</groupId>
+    <artifactId>mule-whisperer-connector</artifactId>
+    <version>0.3.0</version>
+    <classifier>mule-plugin</classifier>
 </dependency>
 ```
 
