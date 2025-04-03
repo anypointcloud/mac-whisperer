@@ -18,10 +18,10 @@ MAC Whisperer supports 2 main use cases,
 
 ```xml
 <dependency>
-   <groupId>io.github.mulesoft-ai-chain-project</groupId>
-   <artifactId>mule4-whisperer-connector</artifactId>
-   <version>{version}</version>
-   <classifier>mule-plugin</classifier>
+    <groupId>cloud.anypoint</groupId>
+    <artifactId>mule-whisperer-connector</artifactId>
+    <version>0.3.0</version>
+    <classifier>mule-plugin</classifier>
 </dependency>
 ```
 
