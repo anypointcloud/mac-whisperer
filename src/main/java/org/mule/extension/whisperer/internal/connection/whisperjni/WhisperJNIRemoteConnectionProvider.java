@@ -14,14 +14,16 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@Alias("whisperjni")
-@DisplayName("Whisper JNI")
-public class WhisperJNIConnectionProvider implements CachedConnectionProvider<WhisperJNIConnection>, Startable, Stoppable {
+@Alias("whisperjniurl")
+@DisplayName("Whisper JNI (Remote .bin)")
+public class WhisperJNIRemoteConnectionProvider
+    implements CachedConnectionProvider<WhisperJNIConnection>, Startable, Stoppable {
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
@@ -38,9 +40,9 @@ public class WhisperJNIConnectionProvider implements CachedConnectionProvider<Wh
     @Optional(defaultValue = "false")
     private boolean printProgress;
 
-    @Parameter
+    @ParameterGroup(name ="Model")
     @Expression(ExpressionSupport.SUPPORTED)
-    private String modelPath;
+    private WhisperJNIRemoteModelParameters model;
 
     private WhisperJNI whisper;
     private WhisperContext whisperContext;
@@ -63,7 +65,7 @@ public class WhisperJNIConnectionProvider implements CachedConnectionProvider<Wh
         try {
             WhisperJNI.loadLibrary();
             whisper = new WhisperJNI();
-            whisperContext = whisper.init(Paths.get(modelPath));
+            whisperContext = whisper.init(Paths.get(model.getModelFilePath()));
 
         } catch (IOException e) {
             throw new StartException(e, this);

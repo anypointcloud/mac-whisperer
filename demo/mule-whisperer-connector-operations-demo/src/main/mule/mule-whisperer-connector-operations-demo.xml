@@ -11,8 +11,12 @@ http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/m
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c7ad9af0-728a-483e-a5c3-46536a98b466" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<whisperer:config name="WhisperJNI_Config" doc:name="MAC Whisperer Config" doc:id="cb1790cd-3500-4b11-b9cb-889ef0857fde" >
+	<whisperer:config name="WhisperJNI_Local_Config" doc:name="MAC Whisperer Config" doc:id="cb1790cd-3500-4b11-b9cb-889ef0857fde" >
 		<whisperer:whisperjni-connection modelPath='/Users/tbolis/IdeaProjects/mule-whisperer-connector/demo/mule-whisperer-connector-operations-demo/src/main/resources/model.bin' printProgress="false"/>
+		<whisperer:whisperjnifile-connection modelFilePath="/Users/tbolis/IdeaProjects/mule-whisperer-connector/demo/mule-whisperer-connector-operations-demo/src/main/resources/model.bin" />
+	</whisperer:config>
+	<whisperer:config name="WhisperJNI_Remote_Config" doc:name="MAC Whisperer Config" doc:id="6fe87adc-89a2-4938-b7fb-748735599540" >
+		<whisperer:whisperjniurl-connection url="https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-tiny.en-q8_0.bin" downloadPath='#[mule.home ++ "/apps/" ++ app.name ++ "/"]' />
 	</whisperer:config>
 	<whisperer:config name="OpenAI_Config" doc:name="MAC Whisperer Config" doc:id="c8522973-353d-4eff-aa3e-21be4b1cfc8e" >
 		<whisperer:openai-connection apiKey="demo" />
@@ -138,7 +142,7 @@ output application/json
         </error-handler>
 	</flow>
 	<flow doc:id="fa9be2cd-68f1-4537-a842-ea8fd7eedd09" name="post:\transcribe:multipart\form-data:whisperer-connector-operations-api-config">
-		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Config" language="it" temperature="#[attributes.queryParams.temperature default 0.5]">
+		<whisperer:speech-to-text doc:name="[Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Local_Config" language="it" temperature="#[attributes.queryParams.temperature default 0.5]">
 			<whisperer:audio-content ><![CDATA[#[(((payload as Object).parts as Object).audio as Object).content]]]></whisperer:audio-content>
 		</whisperer:speech-to-text>
 	</flow>

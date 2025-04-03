@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>com.mulesoft.connectors</groupId>
 			<artifactId>mule4-whisperer-connector</artifactId>
-			<version>0.2.60-SNAPSHOT</version>
+			<version>0.2.66-SNAPSHOT</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
