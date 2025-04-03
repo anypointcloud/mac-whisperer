@@ -14,7 +14,7 @@ public class WhisperJNIRemoteModelParameters {
   @Expression(ExpressionSupport.SUPPORTED)
   @Placement(order = 1)
   @Example("https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-large-v3-turbo-q8_0.bin")
-  private String url;
+  private String modelURL;
 
   @Parameter
   @DisplayName("Download path")
@@ -23,14 +23,12 @@ public class WhisperJNIRemoteModelParameters {
   @Example("mule.home ++ \"/apps/\" ++ app.name ++ \"/\"")
   private String downloadPath;
 
-  private String modelFilePath;
-
-  public String getUrl() {
-    return url;
+  public String getModelURL() {
+    return modelURL;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
+  public void setModelURL(String modelURL) {
+    this.modelURL = modelURL;
   }
 
   public String getDownloadPath() {
@@ -42,6 +40,24 @@ public class WhisperJNIRemoteModelParameters {
   }
 
   public String getModelFilePath() {
-    return modelFilePath;
+    String normalizedPath = downloadPath.endsWith("/") ? downloadPath : downloadPath + "/";
+    return normalizedPath + getModelFileName();
+  }
+
+  private String getModelFileName() {
+
+    try {
+      java.net.URL urlObj = new java.net.URL(modelURL);
+      String path = urlObj.getPath();
+      String fileName = path.substring(path.lastIndexOf('/') + 1);
+
+      if (fileName.isEmpty()) {
+        throw new IllegalArgumentException("No filename found in URL: " + modelURL);
+      }
+
+      return fileName;
+    } catch (java.net.MalformedURLException e) {
+      throw new IllegalArgumentException("Invalid URL: " + modelURL, e);
+    }
   }
 }

@@ -2,6 +2,7 @@ package org.mule.extension.whisperer.internal.connection.whisperjni;
 
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperJNI;
+import org.mule.extension.whisperer.internal.helpers.models.WhisperModelConfigurer;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -18,6 +19,8 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Alias("whisperjniurl")
@@ -63,9 +66,20 @@ public class WhisperJNIRemoteConnectionProvider
     @Override
     public void start() throws MuleException {
         try {
+            String modelFilePathString = model.getModelFilePath();
+            Path modelFilePath = Paths.get(modelFilePathString);
+
+            if (!Files.exists(modelFilePath)) {
+                synchronized (WhisperJNIRemoteConnectionProvider.class) {
+                    if (!Files.exists(modelFilePath)) {
+                        setupModel();
+                    }
+                }
+            }
+
             WhisperJNI.loadLibrary();
             whisper = new WhisperJNI();
-            whisperContext = whisper.init(Paths.get(model.getModelFilePath()));
+            whisperContext = whisper.init(modelFilePath);
 
         } catch (IOException e) {
             throw new StartException(e, this);
@@ -77,5 +91,10 @@ public class WhisperJNIRemoteConnectionProvider
         if (null != whisperContext) {
             whisperContext.close();
         }
+    }
+
+    private void setupModel() {
+
+        WhisperModelConfigurer.setup(model.getModelURL(), model.getModelFilePath());
     }
 }
