@@ -17,11 +17,11 @@ public class WhisperJNIRemoteModelParameters {
   private String modelURL;
 
   @Parameter
-  @DisplayName("Download path")
+  @DisplayName("Installation file path")
   @Expression(ExpressionSupport.SUPPORTED)
   @Placement(order = 2)
-  @Example("mule.home ++ \"/apps/\" ++ app.name ++ \"/\"")
-  private String downloadPath;
+  @Example("mule.home ++ \"/apps/\" ++ app.name ++ \"/model.bin\"")
+  private String installationFilePath;
 
   public String getModelURL() {
     return modelURL;
@@ -31,17 +31,12 @@ public class WhisperJNIRemoteModelParameters {
     this.modelURL = modelURL;
   }
 
-  public String getDownloadPath() {
-    return downloadPath;
+  public String getInstallationFilePath() {
+    return installationFilePath;
   }
 
-  public void setDownloadPath(String downloadPath) {
-    this.downloadPath = downloadPath;
-  }
-
-  public String getModelFilePath() {
-    String normalizedPath = downloadPath.endsWith("/") ? downloadPath : downloadPath + "/";
-    return normalizedPath + getModelFileName();
+  public void setInstallationFilePath(String installationFilePath) {
+    this.installationFilePath = installationFilePath;
   }
 
   private String getModelFileName() {

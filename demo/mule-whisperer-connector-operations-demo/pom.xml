@@ -4,7 +4,7 @@
 
 	<groupId>com.mycompany</groupId>
 	<artifactId>mule-whisperer-connector-operations-demo</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
 	<name>mule-whisperer-connector-operations-demo</name>
@@ -29,6 +29,9 @@
 				<artifactId>mule-maven-plugin</artifactId>
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
+				<configuration>
+					<classifier>---- select project type ----</classifier>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -49,7 +52,7 @@
 		<dependency>
 			<groupId>com.mulesoft.connectors</groupId>
 			<artifactId>mule4-whisperer-connector</artifactId>
-			<version>0.2.67-SNAPSHOT</version>
+			<version>0.2.72-SNAPSHOT</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>

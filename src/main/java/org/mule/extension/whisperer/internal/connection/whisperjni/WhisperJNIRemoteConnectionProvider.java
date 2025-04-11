@@ -2,7 +2,8 @@ package org.mule.extension.whisperer.internal.connection.whisperjni;
 
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperJNI;
-import org.mule.extension.whisperer.internal.helpers.models.WhisperModelConfigurer;
+import org.mule.extension.whisperer.internal.helpers.models.WhisperJNICloudhubConfigurer;
+import org.mule.extension.whisperer.internal.helpers.models.WhisperJNIModelConfigurer;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -17,6 +18,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +30,8 @@ import java.nio.file.Paths;
 @DisplayName("Whisper JNI (Remote .bin)")
 public class WhisperJNIRemoteConnectionProvider
     implements CachedConnectionProvider<WhisperJNIConnection>, Startable, Stoppable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WhisperJNIRemoteConnectionProvider.class);
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
@@ -66,13 +71,25 @@ public class WhisperJNIRemoteConnectionProvider
     @Override
     public void start() throws MuleException {
         try {
-            String modelFilePathString = model.getModelFilePath();
+            String modelFilePathString = model.getInstallationFilePath();
             Path modelFilePath = Paths.get(modelFilePathString);
 
             if (!Files.exists(modelFilePath)) {
                 synchronized (WhisperJNIRemoteConnectionProvider.class) {
                     if (!Files.exists(modelFilePath)) {
-                        setupModel();
+                        WhisperJNIModelConfigurer.setup(model.getModelURL(), model.getInstallationFilePath());
+                    }
+                }
+            }
+
+            if(WhisperJNICloudhubConfigurer.isCloudHubDeployment()) {
+                LOGGER.info("CloudHub deployment detected. Performing CloudHub specific setup.");
+                Path dependenciesPath = Paths.get(WhisperJNICloudhubConfigurer.WHISPER_DEPENDENCY_LIBS_PATH);
+                if(!Files.exists(dependenciesPath)) {
+                    synchronized (WhisperJNIRemoteConnectionProvider.class) {
+                        if (!Files.exists(dependenciesPath)) {
+                            WhisperJNICloudhubConfigurer.setup();
+                        }
                     }
                 }
             }
@@ -91,10 +108,5 @@ public class WhisperJNIRemoteConnectionProvider
         if (null != whisperContext) {
             whisperContext.close();
         }
-    }
-
-    private void setupModel() {
-
-        WhisperModelConfigurer.setup(model.getModelURL(), model.getModelFilePath());
     }
 }

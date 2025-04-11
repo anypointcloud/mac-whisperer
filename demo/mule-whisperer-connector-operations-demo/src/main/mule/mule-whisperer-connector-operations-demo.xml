@@ -11,16 +11,14 @@ http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/m
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c7ad9af0-728a-483e-a5c3-46536a98b466" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<whisperer:config name="WhisperJNI_Local_Config" doc:name="MAC Whisperer Config" doc:id="cb1790cd-3500-4b11-b9cb-889ef0857fde" >
-		<whisperer:whisperjnifile-connection modelFilePath="/Users/tbolis/IdeaProjects/mule-whisperer-connector/demo/mule-whisperer-connector-operations-demo/src/main/resources/model.bin" />
-	</whisperer:config>
 	<whisperer:config name="WhisperJNI_Remote_Config" doc:name="MAC Whisperer Config" doc:id="6fe87adc-89a2-4938-b7fb-748735599540" >
-		<whisperer:whisperjniurl-connection modelURL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en-q8_0.bin" downloadPath='#[mule.home ++ "/apps/" ++ app.name ++ "/"]'/>
+		<whisperer:whisperjniurl-connection modelURL="${model.repositoryUrl}" installationFilePath='${model.installationFilePath}' printProgress="true"/>
 	</whisperer:config>
 	<whisperer:config name="OpenAI_Config" doc:name="MAC Whisperer Config" doc:id="c8522973-353d-4eff-aa3e-21be4b1cfc8e" >
-		<whisperer:openai-connection apiKey="demo" />
+		<whisperer:openai-connection apiKey="${openai.apikey}" />
 	</whisperer:config>
 	<apikit:config outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" doc:name="Router" doc:id="592b3ef8-e02c-452b-839f-ef324b173e5c" name="whisperer-connector-operations-api-config" api="api/whisperer-connector-operations-api.raml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="8992b04e-5fd9-4367-8ea7-e211bbf6e548" file="config.properties" />
 	<flow name="mule-whisperer-connector-operations-demoFlow" doc:id="91f82dca-5a27-469d-8cab-fd991ff5d0ba" >
 		<http:listener doc:name="Listener" doc:id="624573dc-b645-4e0b-b3fb-410ea6335504" config-ref="HTTP_Listener_config" path="/api/*">
 			<http:response statusCode="#[vars.httpStatus default 200]">
@@ -142,11 +140,6 @@ output application/json
 	</flow>
 	<flow doc:id="fa9be2cd-68f1-4537-a842-ea8fd7eedd09" name="post:\transcribe:multipart\form-data:whisperer-connector-operations-api-config">
 		<choice doc:name="Choice" doc:id="19ed36ef-b9c8-491f-bcb2-b45d70fd1f79" >
-			<when expression='#[attributes.queryParams.connection == "whisperJNI-local"]'>
-				<whisperer:speech-to-text doc:name="[WhisperJNI Local] Speech to Text" doc:id="f215e494-2f6c-4dc7-aeb9-055a78883fd5" config-ref="WhisperJNI_Local_Config" language="it" temperature="#[attributes.queryParams.temperature default 0.5]">
-			<whisperer:audio-content><![CDATA[#[(((payload as Object).parts as Object).audio as Object).content]]]></whisperer:audio-content>
-		</whisperer:speech-to-text>
-			</when>
 			<when expression='#[attributes.queryParams.connection == "whisperJNI-remote"]'>
 				<whisperer:speech-to-text doc:name="[WhisperJNI Remote] Speech to Text" doc:id="303ee421-de92-4212-9159-4963dd2a59e9" config-ref="WhisperJNI_Remote_Config" language="it" temperature="#[attributes.queryParams.temperature default 0.5]">
 					<whisperer:audio-content><![CDATA[#[(((payload as Object).parts as Object).audio as Object).content]]]></whisperer:audio-content>
@@ -158,6 +151,11 @@ output application/json
 				</whisperer:speech-to-text>
 			</otherwise>
 		</choice>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a0e8b948-d74b-46ce-a9f0-c01d06528056" type="WHISPERER:TRANSCRIPTION">
+				<set-payload value='#[{&#10;	"error":error.errorMessage&#10;}]' doc:name="Set Payload" doc:id="75254125-8a27-462d-8727-623edf926356" />
+			</on-error-continue>
+		</error-handler>
 	</flow>
 	<flow name="post:\generate:application\json:whisperer-connector-operations-api-config" doc:id="2e139863-a95c-4eaf-bae8-f4df68f18a05" >
 		<whisperer:text-to-speech doc:name="[OpenAI] Text to Speech" doc:id="5833960e-8239-407f-b8b7-8c883c68af5e" config-ref="OpenAI_Config">

@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URL;
 
-public class WhisperModelConfigurer {
+public class WhisperJNIModelConfigurer {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(WhisperModelConfigurer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WhisperJNIModelConfigurer.class);
 
   public static void setup(String modelURL, String modelFilePath) {
 
@@ -19,7 +19,7 @@ public class WhisperModelConfigurer {
 
       LOGGER.info("Downloading Whisper Model from: {}", modelURL);
       FileUtils.copyURLToFile(new URL(modelURL), new File(modelFilePath));
-      LOGGER.info("Whisper Model downloaded from: {}", modelURL);
+      LOGGER.info("Whisper Model downloaded from {} and installed at {}", modelURL, modelFilePath);
 
     } catch (Exception e) {
 

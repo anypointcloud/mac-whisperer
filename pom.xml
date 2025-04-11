@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mulesoft.connectors</groupId>
     <artifactId>mule4-whisperer-connector</artifactId>
-    <version>0.2.67-SNAPSHOT</version>
+    <version>0.2.72-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
     <name>MuleSoft Whisperer Connector - Mule 4</name>
     <description>MuleSoft Whisperer Connector provides capabilities to convert speech to text or text to speech.</description>
@@ -79,6 +79,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.16.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.24.0</version>
         </dependency>
 
         <dependency>
