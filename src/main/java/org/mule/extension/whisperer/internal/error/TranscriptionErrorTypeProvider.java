@@ -13,6 +13,8 @@ public class TranscriptionErrorTypeProvider implements ErrorTypeProvider {
         Set<ErrorTypeDefinition> errorTypes = new HashSet<>();
         errorTypes.add(ConnectorError.TRANSCRIPTION);
         errorTypes.add(ConnectorError.TIMEOUT);
+        errorTypes.add(ConnectorError.AUDIO_FORMAT_NOT_SUPPORTED);
+        errorTypes.add(ConnectorError.MODEL_SETUP_FAILURE);
         return errorTypes;
     }
 }

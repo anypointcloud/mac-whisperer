@@ -12,6 +12,14 @@ baseUriParameters:
 /transcribe:
   post:
     description: Transcribes audio content into text
+    queryParameters:
+      connection:
+        type: string
+        enum: [openai, whisperJNI-remote]
+      temperature:
+        type: number
+        default: 0.5
+        required: false
     body:
       multipart/form-data:
         properties:

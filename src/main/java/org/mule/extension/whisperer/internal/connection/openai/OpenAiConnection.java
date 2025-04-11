@@ -6,7 +6,7 @@ import org.mule.extension.whisperer.api.TTSParamsModelDetails;
 import org.mule.extension.whisperer.internal.connection.WhisperConnection;
 import org.mule.extension.whisperer.internal.error.GenerationException;
 import org.mule.extension.whisperer.internal.error.TranscriptionException;
-import org.mule.extension.whisperer.internal.helpers.AudioUtils;
+import org.mule.extension.whisperer.internal.helpers.audio.AudioUtils;
 import org.json.JSONObject;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.TypedValue;

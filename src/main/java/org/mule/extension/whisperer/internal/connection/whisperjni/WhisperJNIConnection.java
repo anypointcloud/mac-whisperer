@@ -2,16 +2,18 @@ package org.mule.extension.whisperer.internal.connection.whisperjni;
 
 import org.mule.extension.whisperer.api.STTParamsModelDetails;
 import org.mule.extension.whisperer.api.TTSParamsModelDetails;
+import org.mule.extension.whisperer.api.error.ConnectorError;
 import org.mule.extension.whisperer.internal.connection.WhisperConnection;
 import org.mule.extension.whisperer.internal.error.ConnectionIncompatibleException;
 import org.mule.extension.whisperer.internal.error.TranscriptionException;
-import org.mule.extension.whisperer.internal.helpers.AudioFileReader;
-import org.mule.extension.whisperer.internal.helpers.AudioUtils;
+import org.mule.extension.whisperer.internal.helpers.audio.AudioFileReader;
+import org.mule.extension.whisperer.internal.helpers.audio.AudioUtils;
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperFullParams;
 import io.github.givimad.whisperjni.WhisperJNI;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,18 +69,44 @@ public class WhisperJNIConnection implements WhisperConnection {
 
         // Convert audio to WAV if necessary
         String processedFilePath = tempAudioFile.getAbsolutePath();
-        if (!AudioUtils.isWav(audioContent.getDataType().getMediaType())) {
-            LOGGER.trace("Converting audio file to WAV format.");
-            String wavFilePath = processedFilePath.replaceAll("\\.\\w+$", ".wav");
+
+        String audioFormat = AudioUtils.guessAudioFormat(audioContent.getDataType().getMediaType());
+
+        if(audioFormat != null) {
+
             try {
-                AudioFileReader.convertMp3ToWav(processedFilePath, wavFilePath);
+
+                LOGGER.trace("Converting audio file to WAV format.");
+                String wavFilePath = processedFilePath.replaceAll("\\.\\w+$", ".wav");
+
+                switch (audioFormat) {
+                    case "wav":
+                        break;
+                    case "mp3":
+                        AudioFileReader.convertMp3ToWav(processedFilePath, wavFilePath);
+                        processedFilePath = wavFilePath;
+                        break;
+                    case "m4a":
+                        AudioFileReader.convertM4AToWavWithFFmpeg(processedFilePath, wavFilePath);
+                        processedFilePath = wavFilePath;
+                        break;
+                    default:
+                        throw new ModuleException("Audio format not supported: " + audioFormat,
+                                                  ConnectorError.AUDIO_FORMAT_NOT_SUPPORTED);
+                }
+
+                LOGGER.debug("Audio file converted to WAV format: {}", wavFilePath);
+
             } catch (UnsupportedAudioFileException | IOException e) {
                 return CompletableFuture.supplyAsync(() -> {
                     throw new TranscriptionException("Error converting audio content to wav format", e);
                 });
             }
-            processedFilePath = wavFilePath;
-            LOGGER.debug("Audio file converted to WAV format: {}", wavFilePath);
+
+        } else {
+
+            throw new ModuleException("Audio format not supported: " + audioContent.getDataType().getMediaType().toString(),
+                                      ConnectorError.AUDIO_FORMAT_NOT_SUPPORTED);
         }
 
         // Read audio file and extract samples

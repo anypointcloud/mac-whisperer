@@ -26,7 +26,7 @@
         <!-- Mule logger -->
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
         
-        <AsyncLogger name="com.mule.whisperer.internal" level="DEBUG"/>
+        <AsyncLogger name="org.mule.extension.whisperer.internal" level="DEBUG"/>
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="file"/>
