@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mulesoft.connectors</groupId>
     <artifactId>mule4-whisperer-connector</artifactId>
-    <version>0.2.72-SNAPSHOT</version>
+    <version>0.2.73-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
     <name>MuleSoft Whisperer Connector - Mule 4</name>
     <description>MuleSoft Whisperer Connector provides capabilities to convert speech to text or text to speech.</description>
@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-modules-parent</artifactId>
-        <version>1.3.2</version>
+        <version>1.9.0</version>
     </parent>
 
     <properties>

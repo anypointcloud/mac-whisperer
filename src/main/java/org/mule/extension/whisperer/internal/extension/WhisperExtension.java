@@ -17,7 +17,7 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
 @Extension(name = "MAC Whisperer")
 @Configurations(WhispererConfiguration.class)
 @ErrorTypes(ConnectorError.class)
-@JavaVersionSupport({JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_17})
 public class WhisperExtension {
 
 }
