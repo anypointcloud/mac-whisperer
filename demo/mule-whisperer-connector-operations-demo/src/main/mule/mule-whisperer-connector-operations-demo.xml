@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/m
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<whisperer:config name="WhisperJNI_Remote_Config" doc:name="MAC Whisperer Config" doc:id="6fe87adc-89a2-4938-b7fb-748735599540" >
-		<whisperer:whisperjniurl-connection modelURL="${model.repositoryUrl}" installationFilePath='${model.installationFilePath}' printProgress="true"/>
+		<whisperer:whisperjniurl-connection modelURL="${whisperjni.model.repositoryUrl}" installationFilePath='${whisperjni.model.installationFilePath}' printProgress="true"/>
 	</whisperer:config>
 	<whisperer:config name="OpenAI_Config" doc:name="MAC Whisperer Config" doc:id="c8522973-353d-4eff-aa3e-21be4b1cfc8e" >
 		<whisperer:openai-connection apiKey="${openai.apikey}" />
