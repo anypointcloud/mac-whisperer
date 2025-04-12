@@ -1,3 +1,67 @@
-target/
+# IntelliJ IDEA
 .idea/
+*.iws
+*.iml
+*.ipr
+
+# VSCode
+.vscode
+
+# Anypoint Studio
+.metadata/
+.mule/
+.sfdx/
+.tooling*/
+/demo/*/src/test/
+/demo/**/*.bin
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# MuleSoft
+.mule/
+.mule/plugins/
+exchange-docs/
+
+# Logs
+*.log
+
+# OS-specific files
 .DS_Store
+Thumbs.db
+
+# Compiled class files
+*.class
+
+# Generated files
+generated-sources/
+generated-test-sources/
+
+# Configuration files
+.vscode/
+.classpath
+.project
+.settings/
+
+# Miscellaneous
+*.bak
+*.tmp
+*.sh
+
+.java-version
+
+
+# Added by Illuminated Cloud
+.localdev/
+/IlluminatedCloud/
+/out/
+node_modules/
+/.illuminatedCloud/
+**/tsconfig*.json
+**/*.tsbuildinfo
