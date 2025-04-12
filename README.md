@@ -11,8 +11,13 @@ MAC Whisperer supports 2 main use cases,
 
 ### Requirements
 
-- The maximum supported version for Java SDK is JDK 17. You can use JDK 17 only for running your application.
-- Compilation with Java SDK must be done with JDK 11.
+#### Mule Runtime
+Mulesoft Runtime >= 4.9.0
+
+#### JDK
+
+- The  supported version for Java SDK is JDK 17.
+- Compilation with Java SDK must be done with JDK 17.
 
 ### Installation (using maven central dependency)
 
