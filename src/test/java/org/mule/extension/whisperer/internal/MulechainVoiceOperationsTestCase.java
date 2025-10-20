@@ -1,4 +1,4 @@
-package com.mule.mulechain.internal;
+package org.mule.extension.whisperer.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

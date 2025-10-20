@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cloud.anypoint</groupId>
     <artifactId>mule-whisperer-connector</artifactId>
-    <version>0.3.14</version>
+    <version>0.4.0-SNAPSHOT</version>
     <packaging>mule-extension</packaging>
     <name>MuleSoft Whisperer Connector - Mule 4</name>
     <description>MuleSoft Whisperer Connector provides capabilities to convert speech to text or text to speech.</description>
@@ -52,23 +52,28 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- REQUIRED: Pure Java MP3 decoder -->
         <dependency>
             <groupId>javazoom</groupId>
             <artifactId>jlayer</artifactId>
             <version>1.0.1</version>
         </dependency>
 
+        <!-- OPTIONAL: User provides if they need M4A/AAC/FLAC/OGG/WEBM support -->
+        <!-- Platform-specific variants (e.g., ffmpeg-platform-linux-x86_64) are also supported -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>ffmpeg</artifactId>
+            <artifactId>ffmpeg-platform</artifactId>
             <version>6.1.1-1.5.10</version>
+            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-api</artifactId>
             <version>0.9.0-rc1</version>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -109,10 +114,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- JUnit Jupiter for diagnostic testing -->
         <dependency>
-            <groupId>com.github.kokorin.jaffree</groupId>
-            <artifactId>jaffree</artifactId>
-            <version>2024.08.29</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

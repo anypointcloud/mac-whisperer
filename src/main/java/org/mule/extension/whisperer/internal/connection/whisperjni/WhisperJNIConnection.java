@@ -85,7 +85,7 @@ public class WhisperJNIConnection implements SpeechToTextConnection {
                         processedFilePath = wavFilePath;
                         break;
                     case "m4a":
-                        AudioFileReader.convertM4AToWavWithFFmpeg(processedFilePath, wavFilePath);
+                        AudioFileReader.convertM4AToWav(processedFilePath, wavFilePath);
                         processedFilePath = wavFilePath;
                         break;
                     default:
