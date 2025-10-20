@@ -101,9 +101,9 @@ public class AudioFileReader {
     public static void convertM4AToWavWithFFmpeg(String m4aFilePath, String wavFilePath) throws IOException {
 
         try {
-            // Create FFmpeg instance.
-            // If ffmpegExecutablePath is defined, use FFmpeg.atPath(ffmpegExecutablePath)
-            FFmpeg ffmpeg = FFmpeg.atPath(Paths.get("/opt/homebrew/Cellar/ffmpeg/7.1_4/bin")) // Assumes ffmpeg is in PATH
+            // Create FFmpeg instance using system PATH
+            // This will find ffmpeg wherever it's installed on the system
+            FFmpeg ffmpeg = FFmpeg.atPath() // Uses system PATH to find ffmpeg
                 .addInput(UrlInput.fromPath(Paths.get(m4aFilePath)))
                 .addOutput(UrlOutput.toPath(Paths.get(wavFilePath))
                 .addArguments("-acodec", "pcm_s16le")
@@ -118,7 +118,7 @@ public class AudioFileReader {
 
         } catch (Exception e) {
             System.err.println("\nError during conversion: " + e.getMessage());
-            e.printStackTrace();
+            throw new IOException("Failed to convert M4A to WAV using FFmpeg. Ensure FFmpeg is installed and available in the system PATH.", e);
         }
     }
 }

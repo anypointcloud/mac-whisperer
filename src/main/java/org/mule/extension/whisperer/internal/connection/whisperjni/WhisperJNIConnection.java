@@ -1,10 +1,8 @@
 package org.mule.extension.whisperer.internal.connection.whisperjni;
 
 import org.mule.extension.whisperer.api.STTParamsModelDetails;
-import org.mule.extension.whisperer.api.TTSParamsModelDetails;
 import org.mule.extension.whisperer.api.error.ConnectorError;
-import org.mule.extension.whisperer.internal.connection.WhisperConnection;
-import org.mule.extension.whisperer.internal.error.ConnectionIncompatibleException;
+import org.mule.extension.whisperer.internal.connection.SpeechToTextConnection;
 import org.mule.extension.whisperer.internal.error.TranscriptionException;
 import org.mule.extension.whisperer.internal.helpers.audio.AudioFileReader;
 import org.mule.extension.whisperer.internal.helpers.audio.AudioUtils;
@@ -21,7 +19,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import java.util.concurrent.CompletableFuture;
 
-public class WhisperJNIConnection implements WhisperConnection {
+public class WhisperJNIConnection implements SpeechToTextConnection {
     private static final Logger LOGGER = LoggerFactory.getLogger(WhisperJNIConnection.class);
 
     private final WhisperJNI whisper;
@@ -141,14 +139,6 @@ public class WhisperJNIConnection implements WhisperConnection {
             });
         }
     }
-
-    @Override
-    public CompletableFuture<InputStream> generate(String text, TTSParamsModelDetails params) {
-        return CompletableFuture.supplyAsync(() -> {
-            throw new ConnectionIncompatibleException("Operation not supported by Local Whisper connection");
-        });
-    }
-
     public WhisperContext getWhisperContext() {
         return whisperContext;
     }
